@@ -26,5 +26,6 @@ func Api(r *gin.Engine, db *gorm.DB) {
 		Tugas.PATCH("/:id", controller.Update)
 		Tugas.DELETE("/:id", controller.Delete)
 		Tugas.GET("/status/:status", controller.GetByStatus)
+		Tugas.GET("/level/:level", controller.GetBylevel)
 	}
 }
