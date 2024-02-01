@@ -98,3 +98,25 @@ func (uc *TugasController) Delete(ctx *gin.Context) {
 		"data":    data,
 	})
 }
+
+func (uc *TugasController) GetByStatus(c *gin.Context) {
+	// Mengambil nilai status dari URL
+	statusParam := c.Param("status")
+
+	// Mengkonversi statusParam ke boolean
+	status, err := strconv.ParseBool(statusParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status parameter"})
+		return
+	}
+
+	// Memanggil metode GetByStatus dari service
+	result, err := uc.TugasService.GetByStatus(c, status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Mengirimkan respons ke client
+	c.JSON(http.StatusOK, result)
+}

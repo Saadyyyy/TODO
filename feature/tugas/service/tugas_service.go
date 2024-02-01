@@ -17,6 +17,7 @@ type TugasService interface {
 	Create(ctx *gin.Context) (interface{}, error)
 	Update(ctx *gin.Context) (interface{}, error)
 	Delete(ctx *gin.Context) (interface{}, error)
+	GetByStatus(ctx *gin.Context, bol bool) (interface{}, error)
 }
 
 type TugasServiceImpl struct {
@@ -165,4 +166,32 @@ func (us *TugasServiceImpl) Delete(ctx *gin.Context) (interface{}, error) {
 	}
 
 	return respon, nil
+}
+
+// Get tugas by status
+
+func (us *TugasServiceImpl) GetByStatus(ctx *gin.Context, bol bool) (interface{}, error) {
+	status, err := strconv.ParseBool(ctx.Param("status"))
+	if err != nil {
+		return gin.H{"message": "ID not found"}, nil
+	}
+	result, err := us.repo.GetByStatus(status)
+	if err != nil {
+		return gin.H{"message": "ID not found"}, nil
+
+	}
+	respon := []respons.GetIdTugasRespon{}
+	for _, tugas := range result {
+		respons := respons.GetIdTugasRespon{
+			ID:          tugas.ID,
+			Task:        tugas.Task,
+			Level:       tugas.Level,
+			Deadline:    tugas.Deadline,
+			Description: tugas.Description,
+			Status:      status,
+		}
+		respon = append(respon, respons)
+	}
+
+	return []interface{}{respon}, nil
 }
