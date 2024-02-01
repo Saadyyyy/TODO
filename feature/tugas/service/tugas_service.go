@@ -18,6 +18,7 @@ type TugasService interface {
 	Update(ctx *gin.Context) (interface{}, error)
 	Delete(ctx *gin.Context) (interface{}, error)
 	GetByStatus(ctx *gin.Context, bol bool) (interface{}, error)
+	GetBylevel(ctx *gin.Context, level string) (interface{}, error)
 }
 
 type TugasServiceImpl struct {
@@ -188,7 +189,31 @@ func (us *TugasServiceImpl) GetByStatus(ctx *gin.Context, bol bool) (interface{}
 			Level:       tugas.Level,
 			Deadline:    tugas.Deadline,
 			Description: tugas.Description,
-			Status:      status,
+			Status:      tugas.Status,
+		}
+		respon = append(respon, respons)
+	}
+
+	return []interface{}{respon}, nil
+}
+
+// Logic get all level
+
+func (us *TugasServiceImpl) GetBylevel(ctx *gin.Context, level string) (interface{}, error) {
+	result, err := us.repo.GetBylevel(level)
+
+	if err != nil {
+		return gin.H{"message": "level not found"}, nil
+	}
+	respon := []respons.GetIdTugasRespon{}
+	for _, tugas := range result {
+		respons := respons.GetIdTugasRespon{
+			ID:          tugas.ID,
+			Task:        tugas.Task,
+			Level:       tugas.Level,
+			Deadline:    tugas.Deadline,
+			Description: tugas.Description,
+			Status:      tugas.Status,
 		}
 		respon = append(respon, respons)
 	}
