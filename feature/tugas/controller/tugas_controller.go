@@ -99,24 +99,43 @@ func (uc *TugasController) Delete(ctx *gin.Context) {
 	})
 }
 
-func (uc *TugasController) GetByStatus(c *gin.Context) {
+func (uc *TugasController) GetByStatus(ctx *gin.Context) {
 	// Mengambil nilai status dari URL
-	statusParam := c.Param("status")
+	statusParam := ctx.Param("status")
 
 	// Mengkonversi statusParam ke boolean
 	status, err := strconv.ParseBool(statusParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status parameter"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid status parameter"})
 		return
 	}
 
 	// Memanggil metode GetByStatus dari service
-	result, err := uc.TugasService.GetByStatus(c, status)
+	result, err := uc.TugasService.GetByStatus(ctx, status)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Mengirimkan respons ke client
-	c.JSON(http.StatusOK, result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+// controller get tugas level
+func (uc *TugasController) GetBylevel(ctx *gin.Context) {
+	// Mengambil nilai status dari URL
+	level := ctx.Param("level")
+
+	// Memanggil metode GetBylevel dari service
+	result, err := uc.TugasService.GetBylevel(ctx, level)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Mengirimkan respons ke client
+	ctx.JSON(http.StatusOK, gin.H{
+		"massage": "Status ok",
+		"data":    result,
+	})
 }
