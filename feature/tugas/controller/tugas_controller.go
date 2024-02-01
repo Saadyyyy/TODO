@@ -121,13 +121,32 @@ func (uc *TugasController) GetByStatus(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-// controller get tugas level
+// controller get tugas deaGetByDeadline
 func (uc *TugasController) GetBylevel(ctx *gin.Context) {
 	// Mengambil nilai status dari URL
-	level := ctx.Param("level")
+	deaGetBylevel := ctx.Param("deaGetBylevel")
 
 	// Memanggil metode GetBylevel dari service
-	result, err := uc.TugasService.GetBylevel(ctx, level)
+	result, err := uc.TugasService.GetBylevel(ctx, deaGetBylevel)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Mengirimkan respons ke client
+	ctx.JSON(http.StatusOK, gin.H{
+		"massage": "Status ok",
+		"data":    result,
+	})
+}
+
+// controller get tugas deaGetByDeadline
+func (uc *TugasController) GetByDeadline(ctx *gin.Context) {
+	// Mengambil nilai status dari URL
+	deaGetByDeadline := ctx.Param("deadline")
+
+	// Memanggil metode GetByDeadline dari service
+	result, err := uc.TugasService.GetByDeadline(ctx, deaGetByDeadline)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
