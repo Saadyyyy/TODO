@@ -2,6 +2,7 @@ package controller
 
 import (
 	"Todo/feature/tugas/service"
+	"Todo/utils/helper"
 	"net/http"
 	"strconv"
 
@@ -19,13 +20,14 @@ func NewTugasController(tugasService service.TugasService, ctx *gin.Context) *Tu
 }
 
 func (uc *TugasController) GetAll(ctx *gin.Context) {
-	data := uc.TugasService.GetAll()
+	page, perPage := helper.Pagination(ctx)
+
+	data := uc.TugasService.GetAll(ctx, page, perPage)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"massage": "Succes",
+		"message": "Success",
 		"data":    data,
 	})
-
 }
 
 func (uc *TugasController) GetByID(ctx *gin.Context) {
