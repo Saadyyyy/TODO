@@ -4,11 +4,12 @@ import (
 	"Todo/models"
 	"errors"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type TugasRepository interface {
-	GetAll() []models.Tugas
+	GetAll(ctx *gin.Context, page int, perPage int) []models.Tugas
 	GetById(id uint) (models.Tugas, error)
 	Created(models.Tugas) (*models.Tugas, error)
 	Update(models.Tugas) (*models.Tugas, error)
@@ -26,9 +27,11 @@ func NewTugasReporitory(db *gorm.DB) TugasRepository {
 	return &TugasRepositoryImp{db: db}
 }
 
-func (ur *TugasRepositoryImp) GetAll() []models.Tugas {
+func (ur *TugasRepositoryImp) GetAll(ctx *gin.Context, page int, perPage int) []models.Tugas {
 	user := []models.Tugas{}
-	ur.db.Find(&user)
+
+	offsets := (page - 1) * perPage
+	ur.db.Limit(perPage).Offset(offsets).Find(&user)
 
 	return user
 }
