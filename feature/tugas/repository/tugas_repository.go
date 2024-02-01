@@ -14,6 +14,7 @@ type TugasRepository interface {
 	Update(models.Tugas) (*models.Tugas, error)
 	Delete(models.Tugas) (*models.Tugas, error)
 	GetByStatus(bool) ([]models.Tugas, error)
+	GetBylevel(string) ([]models.Tugas, error)
 }
 
 type TugasRepositoryImp struct {
@@ -77,10 +78,20 @@ func (ur *TugasRepositoryImp) Delete(user models.Tugas) (*models.Tugas, error) {
 // GetByStatus implements TugasRepository.
 func (ur *TugasRepositoryImp) GetByStatus(status bool) ([]models.Tugas, error) {
 	user := []models.Tugas{}
-	err := ur.db.Model(&user).Where("status = ?", status).Find(&user).Error
+	err := ur.db.Model(&user).Where("level = ?", status).Find(&user).Error
 	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+//Get tugas by level
+func (ur *TugasRepositoryImp) GetBylevel(level string) ([]models.Tugas, error) {
+	tugas := []models.Tugas{}
+	err := ur.db.Model(&tugas).Where("level LIKE ?", "%"+level+"%").Find(&tugas).Error
+	if err != nil {
+		return nil, err
+	}
+	return tugas, nil
 }
