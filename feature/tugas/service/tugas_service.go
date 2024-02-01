@@ -12,7 +12,7 @@ import (
 )
 
 type TugasService interface {
-	GetAll() []interface{}
+	GetAll(ctx *gin.Context, page int, perPage int) []interface{}
 	GetById(ctx *gin.Context) (interface{}, error)
 	Create(ctx *gin.Context) (interface{}, error)
 	Update(ctx *gin.Context) (interface{}, error)
@@ -31,8 +31,8 @@ func NewTugasService(repo repository.TugasRepository) TugasService {
 }
 
 //get all tugas
-func (us *TugasServiceImpl) GetAll() []interface{} {
-	result := us.repo.GetAll()
+func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []interface{} {
+	result := us.repo.GetAll(ctx, page, perPage)
 	if result == nil {
 		return nil
 	}
