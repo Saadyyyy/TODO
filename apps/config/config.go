@@ -42,7 +42,7 @@ func InitializeDatabase() *gorm.DB {
 
 	// // Migrate tabel pengguna
 	db.AutoMigrate(&models.Tugas{})
-	// db.AutoMigrate(&models.Image{})
+	db.AutoMigrate(&models.Notification{})
 
 	return db
 }

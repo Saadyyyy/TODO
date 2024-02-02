@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"Todo/feature/tugas/controller"
-	"Todo/feature/tugas/repository"
-	"Todo/feature/tugas/service"
+	"Todo/api/controller"
+	"Todo/api/repository"
+	"Todo/api/service"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
