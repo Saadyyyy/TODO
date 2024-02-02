@@ -14,9 +14,9 @@ type TugasRepository interface {
 	Created(models.Tugas) (*models.Tugas, error)
 	Update(models.Tugas) (*models.Tugas, error)
 	Delete(models.Tugas) (*models.Tugas, error)
-	GetByStatus(bool) ([]models.Tugas, error)
-	GetBylevel(string) ([]models.Tugas, error)
-	GetByDeadline(string) ([]models.Tugas, error)
+	GetByStatus(sts bool, page int, perPage int) ([]models.Tugas, error)
+	GetBylevel(lvl string, page int, perPage int) ([]models.Tugas, error)
+	GetByDeadline(ded string, page int, perPage int) ([]models.Tugas, error)
 }
 
 type TugasRepositoryImp struct {
@@ -80,29 +80,31 @@ func (ur *TugasRepositoryImp) Delete(user models.Tugas) (*models.Tugas, error) {
 }
 
 // GetByStatus implements TugasRepository.
-func (ur *TugasRepositoryImp) GetByStatus(status bool) ([]models.Tugas, error) {
-	user := []models.Tugas{}
-	err := ur.db.Model(&user).Where("level = ?", status).Find(&user).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-//Get tugas by level
-func (ur *TugasRepositoryImp) GetBylevel(level string) ([]models.Tugas, error) {
+func (ur *TugasRepositoryImp) GetByStatus(status bool, page int, perPage int) ([]models.Tugas, error) {
 	tugas := []models.Tugas{}
-	err := ur.db.Model(&tugas).Where("level LIKE ?", "%"+level+"%").Find(&tugas).Error
+	offsets := (page - 1) * perPage
+	err := ur.db.Model(&tugas).Where("status = ?", status).Limit(perPage).Offset(offsets).Find(&tugas).Error
 	if err != nil {
 		return nil, err
 	}
 	return tugas, nil
 }
 
-func (ur *TugasRepositoryImp) GetByDeadline(deadline string) ([]models.Tugas, error) {
+//Get tugas by level
+func (ur *TugasRepositoryImp) GetBylevel(level string, page int, perPage int) ([]models.Tugas, error) {
 	tugas := []models.Tugas{}
-	err := ur.db.Model(&tugas).Where("deadline LIKE ?", "%"+deadline+"%").Find(&tugas).Error
+	offsets := (page - 1) * perPage
+	err := ur.db.Model(&tugas).Where("level LIKE ?", "%"+level+"%").Limit(perPage).Offset(offsets).Find(&tugas).Error
+	if err != nil {
+		return nil, err
+	}
+	return tugas, nil
+}
+
+func (ur *TugasRepositoryImp) GetByDeadline(deadline string, page int, perPage int) ([]models.Tugas, error) {
+	tugas := []models.Tugas{}
+	offsets := (page - 1) * perPage
+	err := ur.db.Model(&tugas).Where("deadline LIKE ?", "%"+deadline+"%").Limit(perPage).Offset(offsets).Find(&tugas).Error
 	if err != nil {
 		return nil, err
 	}

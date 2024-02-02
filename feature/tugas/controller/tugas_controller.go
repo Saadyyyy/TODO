@@ -102,6 +102,7 @@ func (uc *TugasController) Delete(ctx *gin.Context) {
 }
 
 func (uc *TugasController) GetByStatus(ctx *gin.Context) {
+	page, perPage := helper.Pagination(ctx)
 	// Mengambil nilai status dari URL
 	statusParam := ctx.Param("status")
 
@@ -113,23 +114,27 @@ func (uc *TugasController) GetByStatus(ctx *gin.Context) {
 	}
 
 	// Memanggil metode GetByStatus dari service
-	result, err := uc.TugasService.GetByStatus(ctx, status)
+	result, err := uc.TugasService.GetByStatus(ctx, status, page, perPage)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Mengirimkan respons ke client
-	ctx.JSON(http.StatusOK, result)
+	ctx.JSON(http.StatusOK, gin.H{
+		"massage": "Status ok",
+		"data":    result,
+	})
 }
 
 // controller get tugas deaGetByDeadline
 func (uc *TugasController) GetBylevel(ctx *gin.Context) {
+	page, perPage := helper.Pagination(ctx)
 	// Mengambil nilai status dari URL
-	deaGetBylevel := ctx.Param("deaGetBylevel")
+	deaGetBylevel := ctx.Param("level")
 
 	// Memanggil metode GetBylevel dari service
-	result, err := uc.TugasService.GetBylevel(ctx, deaGetBylevel)
+	result, err := uc.TugasService.GetBylevel(ctx, deaGetBylevel, page, perPage)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -144,11 +149,12 @@ func (uc *TugasController) GetBylevel(ctx *gin.Context) {
 
 // controller get tugas deaGetByDeadline
 func (uc *TugasController) GetByDeadline(ctx *gin.Context) {
+	page, perPage := helper.Pagination(ctx)
 	// Mengambil nilai status dari URL
-	deaGetByDeadline := ctx.Param("deadline")
+	deaGetBylevel := ctx.Param("deadline")
 
-	// Memanggil metode GetByDeadline dari service
-	result, err := uc.TugasService.GetByDeadline(ctx, deaGetByDeadline)
+	// Memanggil metode GetBylevel dari service
+	result, err := uc.TugasService.GetByDeadline(ctx, deaGetBylevel, page, perPage)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
