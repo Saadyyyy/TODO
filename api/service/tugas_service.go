@@ -32,12 +32,12 @@ func NewTugasService(repo repository.TugasRepository) TugasService {
 	return &TugasServiceImpl{repo: repo}
 }
 
-//get all tugas
+// get all tugas
 func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon {
 	result := us.repo.GetAll(ctx, page, perPage)
-	// if result == nil {
-	// 	return nil
-	// }
+	if result == nil {
+		return nil
+	}
 
 	respon := []respons.GetIdTugasRespon{}
 	for _, tugas := range result {
@@ -55,7 +55,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
 	return respon
 }
 
-//get tugas by id
+// get tugas by id
 func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -111,11 +111,11 @@ func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon,
 	return respon, nil
 }
 
-//Update tugas
+// Update tugas
 func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return gin.H{"message": "ID not found"}, nil
+		return nil, err
 	}
 
 	GetId, err := us.repo.GetById(uint(id))

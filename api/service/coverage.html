@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">Todo/api/service/tugas_service.go (15.7%)</option>
+				<option value="file0">Todo/api/service/tugas_service.go (22.4%)</option>
 				
 				</select>
 			</div>
@@ -103,14 +103,14 @@ func NewTugasService(repo repository.TugasRepository) TugasService <span class="
         return &amp;TugasServiceImpl{repo: repo}
 }</span>
 
-//get all tugas
+// get all tugas
 func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon <span class="cov8" title="1">{
         result := us.repo.GetAll(ctx, page, perPage)
-        // if result == nil {
-        //         return nil
-        // }
+        if result == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
 
-        respon := []respons.GetIdTugasRespon{}
+        <span class="cov8" title="1">respon := []respons.GetIdTugasRespon{}
         for _, tugas := range result </span><span class="cov8" title="1">{
                 respons := respons.GetIdTugasRespon{
                         ID:          tugas.ID,
@@ -126,7 +126,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
         <span class="cov8" title="1">return respon</span>
 }
 
-//get tugas by id
+// get tugas by id
 func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) <span class="cov8" title="1">{
         id, err := strconv.Atoi(ctx.Param("id"))
         if err != nil </span><span class="cov0" title="0">{
@@ -182,15 +182,15 @@ func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon,
         return respon, nil</span>
 }
 
-//Update tugas
-func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) <span class="cov0" title="0">{
+// Update tugas
+func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) <span class="cov8" title="1">{
         id, err := strconv.Atoi(ctx.Param("id"))
         if err != nil </span><span class="cov0" title="0">{
                 return gin.H{"message": "ID not found"}, nil
         }</span>
 
-        <span class="cov0" title="0">GetId, err := us.repo.GetById(uint(id))
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">GetId, err := us.repo.GetById(uint(id))
+        if err != nil </span><span class="cov8" title="1">{
                 return nil, err
         }</span>
 
