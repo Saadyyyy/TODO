@@ -4,6 +4,7 @@ import (
 	"Todo/api/repository"
 	respons "Todo/api/service/Respons"
 	"Todo/models"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,9 +14,9 @@ import (
 )
 
 type TugasService interface {
-	GetAll(ctx *gin.Context, page int, perPage int) []interface{}
+	GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon
 	GetById(ctx *gin.Context) (interface{}, error)
-	Create(ctx *gin.Context) (interface{}, error)
+	Create(ctx *gin.Context) (respons.CreateTugasRespon, error)
 	Update(ctx *gin.Context) (interface{}, error)
 	Delete(ctx *gin.Context) (interface{}, error)
 	GetByStatus(ctx *gin.Context, bol bool, page int, perPage int) (interface{}, error)
@@ -32,11 +33,11 @@ func NewTugasService(repo repository.TugasRepository) TugasService {
 }
 
 //get all tugas
-func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []interface{} {
+func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon {
 	result := us.repo.GetAll(ctx, page, perPage)
-	if result == nil {
-		return nil
-	}
+	// if result == nil {
+	// 	return nil
+	// }
 
 	respon := []respons.GetIdTugasRespon{}
 	for _, tugas := range result {
@@ -51,7 +52,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []in
 		respon = append(respon, respons)
 	}
 
-	return []interface{}{respon}
+	return respon
 }
 
 //get tugas by id
@@ -78,21 +79,25 @@ func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) {
 }
 
 // create tugas
-func (us *TugasServiceImpl) Create(ctx *gin.Context) (interface{}, error) {
+func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon, error) {
+	if ctx == nil {
+		return respons.CreateTugasRespon{}, errors.New("context is nil")
+	}
 	input := models.Tugas{}
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		return nil, err
+		return respons.CreateTugasRespon{}, err
 	}
 
 	validator := validator.New()
 	if err := validator.Struct(input); err != nil {
-		return nil, err
+		return respons.CreateTugasRespon{}, err
 	}
 
 	result, err := us.repo.Created(input)
 	if err != nil {
-		return nil, err
+		return respons.CreateTugasRespon{}, err
 	}
+
 	respon := respons.CreateTugasRespon{
 		ID:          result.ID,
 		Task:        result.Task,
