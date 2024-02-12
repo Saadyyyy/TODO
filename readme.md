@@ -18,7 +18,7 @@ Todo list is a REST API for student, student can input their assigments.
 
 ## How To Install To Your Local And Run
 
-1.  git clone 
+1.  git clone https://github.com/Saadyyyy/TODO.git
 2.  cd TODO
 3.  create file .env 
 4.  copy .envExsample dan input you local database
