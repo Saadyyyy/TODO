@@ -125,7 +125,7 @@ func Test_Update(t *testing.T) {
 
 	mockRepo.On("GetById", mockResult.ID).Return(mockResult, nil).Once()
 
-	mockRepo.On("Update", mockResult).Return(mockResult, nil).Once()
+	mockRepo.On("Update").Return(mockResult, nil).Once()
 
 	defer mockRepo.AssertExpectations(t)
 
