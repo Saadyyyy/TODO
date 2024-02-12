@@ -15,10 +15,10 @@ import (
 
 type TugasService interface {
 	GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon
-	GetById(ctx *gin.Context) (interface{}, error)
+	GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error)
 	Create(ctx *gin.Context) (respons.CreateTugasRespon, error)
-	Update(ctx *gin.Context) (interface{}, error)
-	Delete(ctx *gin.Context) (interface{}, error)
+	Update(ctx *gin.Context) (*respons.UpdateTugasRespon, error)
+	Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error)
 	GetByStatus(ctx *gin.Context, bol bool, page int, perPage int) (interface{}, error)
 	GetBylevel(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
 	GetByDeadline(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
@@ -35,9 +35,6 @@ func NewTugasService(repo repository.TugasRepository) TugasService {
 // get all tugas
 func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon {
 	result := us.repo.GetAll(ctx, page, perPage)
-	if result == nil {
-		return nil
-	}
 
 	respon := []respons.GetIdTugasRespon{}
 	for _, tugas := range result {
@@ -56,7 +53,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
 }
 
 // get tugas by id
-func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) {
+func (us *TugasServiceImpl) GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		return nil, err
@@ -75,7 +72,7 @@ func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) {
 		Status:      result.Status,
 	}
 
-	return respons, nil
+	return &respons, nil
 }
 
 // create tugas
@@ -112,7 +109,7 @@ func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon,
 }
 
 // Update tugas
-func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) {
+func (us *TugasServiceImpl) Update(ctx *gin.Context) (*respons.UpdateTugasRespon, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		return nil, err
@@ -147,24 +144,24 @@ func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) {
 		Update_at:   time.Now(),
 	}
 
-	return respon, nil
+	return &respon, nil
 }
 
 // delete tugas
-func (us *TugasServiceImpl) Delete(ctx *gin.Context) (interface{}, error) {
+func (us *TugasServiceImpl) Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		return nil, err
+		return respons.DeleteTugasRespon{}, err
 	}
 
 	GetId, err := us.repo.GetById(uint(id))
 	if err != nil {
-		return nil, err
+		return respons.DeleteTugasRespon{}, err
 	}
 
 	result, err := us.repo.Delete(GetId)
 	if err != nil {
-		return nil, err
+		return respons.DeleteTugasRespon{}, err
 	}
 
 	respon := respons.DeleteTugasRespon{

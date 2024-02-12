@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">Todo/api/service/tugas_service.go (22.4%)</option>
+				<option value="file0">Todo/api/service/tugas_service.go (15.7%)</option>
 				
 				</select>
 			</div>
@@ -86,10 +86,10 @@ import (
 
 type TugasService interface {
         GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon
-        GetById(ctx *gin.Context) (interface{}, error)
+        GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error)
         Create(ctx *gin.Context) (respons.CreateTugasRespon, error)
         Update(ctx *gin.Context) (interface{}, error)
-        Delete(ctx *gin.Context) (interface{}, error)
+        Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error)
         GetByStatus(ctx *gin.Context, bol bool, page int, perPage int) (interface{}, error)
         GetBylevel(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
         GetByDeadline(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
@@ -106,11 +106,8 @@ func NewTugasService(repo repository.TugasRepository) TugasService <span class="
 // get all tugas
 func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon <span class="cov8" title="1">{
         result := us.repo.GetAll(ctx, page, perPage)
-        if result == nil </span><span class="cov0" title="0">{
-                return nil
-        }</span>
 
-        <span class="cov8" title="1">respon := []respons.GetIdTugasRespon{}
+        respon := []respons.GetIdTugasRespon{}
         for _, tugas := range result </span><span class="cov8" title="1">{
                 respons := respons.GetIdTugasRespon{
                         ID:          tugas.ID,
@@ -127,7 +124,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
 }
 
 // get tugas by id
-func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) <span class="cov8" title="1">{
+func (us *TugasServiceImpl) GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error) <span class="cov8" title="1">{
         id, err := strconv.Atoi(ctx.Param("id"))
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
@@ -146,7 +143,7 @@ func (us *TugasServiceImpl) GetById(ctx *gin.Context) (interface{}, error) <span
                 Status:      result.Status,
         }
 
-        return respons, nil</span>
+        return &amp;respons, nil</span>
 }
 
 // create tugas
@@ -183,14 +180,14 @@ func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon,
 }
 
 // Update tugas
-func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) <span class="cov8" title="1">{
+func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) <span class="cov0" title="0">{
         id, err := strconv.Atoi(ctx.Param("id"))
         if err != nil </span><span class="cov0" title="0">{
-                return gin.H{"message": "ID not found"}, nil
+                return nil, err
         }</span>
 
-        <span class="cov8" title="1">GetId, err := us.repo.GetById(uint(id))
-        if err != nil </span><span class="cov8" title="1">{
+        <span class="cov0" title="0">GetId, err := us.repo.GetById(uint(id))
+        if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
 
@@ -222,20 +219,20 @@ func (us *TugasServiceImpl) Update(ctx *gin.Context) (interface{}, error) <span 
 }
 
 // delete tugas
-func (us *TugasServiceImpl) Delete(ctx *gin.Context) (interface{}, error) <span class="cov0" title="0">{
+func (us *TugasServiceImpl) Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error) <span class="cov0" title="0">{
         id, err := strconv.Atoi(ctx.Param("id"))
         if err != nil </span><span class="cov0" title="0">{
-                return nil, err
+                return respons.DeleteTugasRespon{}, err
         }</span>
 
         <span class="cov0" title="0">GetId, err := us.repo.GetById(uint(id))
         if err != nil </span><span class="cov0" title="0">{
-                return nil, err
+                return respons.DeleteTugasRespon{}, err
         }</span>
 
         <span class="cov0" title="0">result, err := us.repo.Delete(GetId)
         if err != nil </span><span class="cov0" title="0">{
-                return nil, err
+                return respons.DeleteTugasRespon{}, err
         }</span>
 
         <span class="cov0" title="0">respon := respons.DeleteTugasRespon{
