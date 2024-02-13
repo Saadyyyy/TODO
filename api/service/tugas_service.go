@@ -4,9 +4,6 @@ import (
 	"Todo/api/repository"
 	respons "Todo/api/service/Respons"
 	"Todo/models"
-	"errors"
-	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,13 +12,13 @@ import (
 
 type TugasService interface {
 	GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon
-	GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error)
-	Create(ctx *gin.Context) (respons.CreateTugasRespon, error)
-	Update(ctx *gin.Context) (*respons.UpdateTugasRespon, error)
-	Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error)
-	GetByStatus(ctx *gin.Context, bol bool, page int, perPage int) (interface{}, error)
-	GetBylevel(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
-	GetByDeadline(ctx *gin.Context, level string, page int, perPage int) (interface{}, error)
+	GetById(id int) (*respons.GetIdTugasRespon, error)
+	Create(*models.Tugas) (*respons.CreateTugasRespon, error)
+	Update(id int, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error)
+	Delete(id int) (*respons.DeleteTugasRespon, error)
+	GetByStatus(bol bool, page int, perPage int) ([]respons.GetIdTugasRespon, error)
+	GetBylevel(level string, page int, perPage int) ([]respons.GetIdTugasRespon, error)
+	GetByDeadline(level string, page int, perPage int) ([]respons.GetIdTugasRespon, error)
 }
 
 type TugasServiceImpl struct {
@@ -53,12 +50,7 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
 }
 
 // get tugas by id
-func (us *TugasServiceImpl) GetById(ctx *gin.Context) (*respons.GetIdTugasRespon, error) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		return nil, err
-	}
-
+func (us *TugasServiceImpl) GetById(id int) (*respons.GetIdTugasRespon, error) {
 	result, err := us.repo.GetById(uint(id))
 	if err != nil {
 		return nil, err
@@ -76,26 +68,15 @@ func (us *TugasServiceImpl) GetById(ctx *gin.Context) (*respons.GetIdTugasRespon
 }
 
 // create tugas
-func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon, error) {
-	if ctx == nil {
-		return respons.CreateTugasRespon{}, errors.New("context is nil")
-	}
-	input := models.Tugas{}
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		return respons.CreateTugasRespon{}, err
-	}
-
+func (us *TugasServiceImpl) Create(input *models.Tugas) (*respons.CreateTugasRespon, error) {
 	validator := validator.New()
-	if err := validator.Struct(input); err != nil {
-		return respons.CreateTugasRespon{}, err
-	}
+	validator.Struct(input)
 
 	result, err := us.repo.Created(input)
 	if err != nil {
-		return respons.CreateTugasRespon{}, err
+		return nil, err
 	}
-
-	respon := respons.CreateTugasRespon{
+	data := respons.CreateTugasRespon{
 		ID:          result.ID,
 		Task:        result.Task,
 		Level:       result.Level,
@@ -105,37 +86,26 @@ func (us *TugasServiceImpl) Create(ctx *gin.Context) (respons.CreateTugasRespon,
 		Created_at:  result.CreatedAt,
 	}
 
-	return respon, nil
+	return &data, nil
 }
 
 // Update tugas
-func (us *TugasServiceImpl) Update(ctx *gin.Context) (*respons.UpdateTugasRespon, error) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+func (us *TugasServiceImpl) Update(ids int, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error) {
+	getId, err := us.repo.GetById(uint(ids))
 	if err != nil {
 		return nil, err
 	}
 
-	GetId, err := us.repo.GetById(uint(id))
+	// Update data dengan nilai yang diperbarui
+	getId.Status = up.Status
+
+	// Panggil metode Update pada repositori
+	result, err := us.repo.Update(getId)
 	if err != nil {
 		return nil, err
 	}
-
-	if err := ctx.ShouldBindJSON(&GetId); err != nil {
-		return nil, err
-	}
-
-	validator := validator.New()
-	if err := validator.Struct(GetId); err != nil {
-		return nil, err
-	}
-
-	result, err := us.repo.Update(GetId)
-	if err != nil {
-		return nil, err
-	}
-
 	respon := respons.UpdateTugasRespon{
-		ID:          uint(id),
+		ID:          result.ID,
 		Task:        result.Task,
 		Level:       result.Level,
 		Deadline:    result.Deadline,
@@ -148,20 +118,14 @@ func (us *TugasServiceImpl) Update(ctx *gin.Context) (*respons.UpdateTugasRespon
 }
 
 // delete tugas
-func (us *TugasServiceImpl) Delete(ctx *gin.Context) (respons.DeleteTugasRespon, error) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+func (us *TugasServiceImpl) Delete(ids int) (*respons.DeleteTugasRespon, error) {
+	getId, err := us.repo.GetById(uint(ids))
 	if err != nil {
-		return respons.DeleteTugasRespon{}, err
+		return nil, err
 	}
-
-	GetId, err := us.repo.GetById(uint(id))
+	result, err := us.repo.Delete(getId)
 	if err != nil {
-		return respons.DeleteTugasRespon{}, err
-	}
-
-	result, err := us.repo.Delete(GetId)
-	if err != nil {
-		return respons.DeleteTugasRespon{}, err
+		return nil, err
 	}
 
 	respon := respons.DeleteTugasRespon{
@@ -170,19 +134,16 @@ func (us *TugasServiceImpl) Delete(ctx *gin.Context) (respons.DeleteTugasRespon,
 		Deleted_at: result.DeletedAt.Time,
 	}
 
-	return respon, nil
+	return &respon, nil
 }
 
 // Get tugas by status
 
-func (us *TugasServiceImpl) GetByStatus(ctx *gin.Context, bol bool, page int, perPage int) (interface{}, error) {
-	status, err := strconv.ParseBool(ctx.Param("status"))
+func (us *TugasServiceImpl) GetByStatus(bol bool, page int, perPage int) ([]respons.GetIdTugasRespon, error) {
+
+	result, err := us.repo.GetByStatus(bol, page, perPage)
 	if err != nil {
-		return gin.H{"message": "ID not found"}, nil
-	}
-	result, err := us.repo.GetByStatus(status, page, perPage)
-	if err != nil {
-		return gin.H{"message": "ID not found"}, nil
+		return nil, nil
 
 	}
 	respon := []respons.GetIdTugasRespon{}
@@ -198,16 +159,16 @@ func (us *TugasServiceImpl) GetByStatus(ctx *gin.Context, bol bool, page int, pe
 		respon = append(respon, respons)
 	}
 
-	return []interface{}{respon}, nil
+	return respon, nil
 }
 
 // Logic get all level
 
-func (us *TugasServiceImpl) GetBylevel(ctx *gin.Context, level string, page int, perPage int) (interface{}, error) {
+func (us *TugasServiceImpl) GetBylevel(level string, page int, perPage int) ([]respons.GetIdTugasRespon, error) {
 	result, err := us.repo.GetBylevel(level, page, perPage)
 
 	if err != nil {
-		return gin.H{"message": "level not found"}, nil
+		return nil, err
 	}
 	respon := []respons.GetIdTugasRespon{}
 	for _, tugas := range result {
@@ -222,19 +183,17 @@ func (us *TugasServiceImpl) GetBylevel(ctx *gin.Context, level string, page int,
 		respon = append(respon, respons)
 	}
 
-	return []interface{}{respon}, nil
+	return respon, nil
 }
 
-func (us *TugasServiceImpl) GetByDeadline(ctx *gin.Context, deadline string, page int, perPage int) (interface{}, error) {
+func (us *TugasServiceImpl) GetByDeadline(deadline string, page int, perPage int) ([]respons.GetIdTugasRespon, error) {
 	result, err := us.repo.GetByDeadline(deadline, page, perPage)
 
 	if err != nil {
-		// Log the error for debugging purposes
-		fmt.Println("Error in GetByDeadline:", err)
-		return gin.H{"message": "error retrieving tasks"}, err
+		return nil, err
 	}
 
-	respon := make([]respons.GetIdTugasRespon, 0, len(result))
+	respon := []respons.GetIdTugasRespon{}
 	for _, tugas := range result {
 		response := respons.GetIdTugasRespon{
 			ID:          tugas.ID,
@@ -246,6 +205,6 @@ func (us *TugasServiceImpl) GetByDeadline(ctx *gin.Context, deadline string, pag
 		}
 		respon = append(respon, response)
 	}
-	return []interface{}{respon}, nil
+	return respon, nil
 
 }
