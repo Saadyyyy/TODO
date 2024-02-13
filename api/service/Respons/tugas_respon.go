@@ -3,7 +3,7 @@ package respons
 import "time"
 
 type CreateTugasRespon struct {
-	ID          uint `gorm:"type:auto_increment"`
+	ID          uint
 	Task        string
 	Level       string
 	Deadline    string
