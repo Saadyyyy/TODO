@@ -30,7 +30,7 @@ func (ur *TugasRepositoryImp) GetAll(ctx *gin.Context, page int, perPage int) []
 	user := []models.Tugas{}
 
 	offsets := (page - 1) * perPage
-	ur.db.Limit(perPage).Offset(offsets).Find(&user)
+	ur.db.Order("COALESCE(updated_at, created_at) DESC").Limit(perPage).Offset(offsets).Find(&user)
 
 	return user
 }
@@ -68,7 +68,7 @@ func (ur *TugasRepositoryImp) Delete(user *models.Tugas) (*models.Tugas, error) 
 func (ur *TugasRepositoryImp) GetByStatus(status bool, page int, perPage int) ([]*models.Tugas, error) {
 	tugas := []*models.Tugas{}
 	offsets := (page - 1) * perPage
-	err := ur.db.Model(&tugas).Where("status = ?", status).Limit(perPage).Offset(offsets).Find(&tugas).Error
+	err := ur.db.Model(&tugas).Where("status = ?", status).Order("COALESCE(updated_at, created_at) DESC").Limit(perPage).Offset(offsets).Find(&tugas).Error
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (ur *TugasRepositoryImp) GetByStatus(status bool, page int, perPage int) ([
 func (ur *TugasRepositoryImp) GetBylevel(level string, page int, perPage int) ([]*models.Tugas, error) {
 	tugas := []*models.Tugas{}
 	offsets := (page - 1) * perPage
-	err := ur.db.Model(&tugas).Where("level LIKE ?", "%"+level+"%").Limit(perPage).Offset(offsets).Find(&tugas).Error
+	err := ur.db.Model(&tugas).Where("level LIKE ?", "%"+level+"%").Order("COALESCE(updated_at, created_at) DESC").Limit(perPage).Offset(offsets).Find(&tugas).Error
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (ur *TugasRepositoryImp) GetBylevel(level string, page int, perPage int) ([
 func (ur *TugasRepositoryImp) GetByDeadline(deadline string, page int, perPage int) ([]*models.Tugas, error) {
 	tugas := []*models.Tugas{}
 	offsets := (page - 1) * perPage
-	err := ur.db.Model(&tugas).Where("deadline LIKE ?", "%"+deadline+"%").Limit(perPage).Offset(offsets).Find(&tugas).Error
+	err := ur.db.Model(&tugas).Where("deadline LIKE ?", "%"+deadline+"%").Order("COALESCE(updated_at, created_at) DESC").Limit(perPage).Offset(offsets).Find(&tugas).Error
 	if err != nil {
 		return nil, err
 	}
