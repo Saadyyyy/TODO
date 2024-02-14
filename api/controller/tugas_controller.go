@@ -40,7 +40,7 @@ func (uc *TugasController) GetByID(ctx *gin.Context) {
 			"Data":    err,
 		})
 	}
-	data, err := uc.TugasService.GetById(id)
+	data, err := uc.TugasService.GetById(uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"massage": "Error",
@@ -93,7 +93,7 @@ func (uc *TugasController) Update(ctx *gin.Context) {
 		return
 	}
 
-	data, err := uc.TugasService.Update(id, tugas)
+	data, err := uc.TugasService.Update(uint(id), tugas)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -119,7 +119,7 @@ func (uc *TugasController) Delete(ctx *gin.Context) {
 		})
 		return
 	}
-	data, err := uc.TugasService.Delete(id)
+	data, err := uc.TugasService.Delete(uint(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"massage": "Status Internal Server Error",
