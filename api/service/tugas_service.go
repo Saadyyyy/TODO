@@ -12,10 +12,10 @@ import (
 
 type TugasService interface {
 	GetAll(ctx *gin.Context, page int, perPage int) []respons.GetIdTugasRespon
-	GetById(id int) (*respons.GetIdTugasRespon, error)
+	GetById(id uint) (*respons.GetIdTugasRespon, error)
 	Create(*models.Tugas) (*respons.CreateTugasRespon, error)
-	Update(id int, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error)
-	Delete(id int) (*respons.DeleteTugasRespon, error)
+	Update(id uint, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error)
+	Delete(id uint) (*respons.DeleteTugasRespon, error)
 	GetByStatus(bol bool, page int, perPage int) ([]respons.GetIdTugasRespon, error)
 	GetBylevel(level string, page int, perPage int) ([]respons.GetIdTugasRespon, error)
 	GetByDeadline(level string, page int, perPage int) ([]respons.GetIdTugasRespon, error)
@@ -50,8 +50,8 @@ func (us *TugasServiceImpl) GetAll(ctx *gin.Context, page int, perPage int) []re
 }
 
 // get tugas by id
-func (us *TugasServiceImpl) GetById(id int) (*respons.GetIdTugasRespon, error) {
-	result, err := us.repo.GetById(uint(id))
+func (us *TugasServiceImpl) GetById(id uint) (*respons.GetIdTugasRespon, error) {
+	result, err := us.repo.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +90,8 @@ func (us *TugasServiceImpl) Create(input *models.Tugas) (*respons.CreateTugasRes
 }
 
 // Update tugas
-func (us *TugasServiceImpl) Update(ids int, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error) {
-	getId, err := us.repo.GetById(uint(ids))
+func (us *TugasServiceImpl) Update(ids uint, up respons.UpdateTugasRespon) (*respons.UpdateTugasRespon, error) {
+	getId, err := us.repo.GetById(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -118,8 +118,8 @@ func (us *TugasServiceImpl) Update(ids int, up respons.UpdateTugasRespon) (*resp
 }
 
 // delete tugas
-func (us *TugasServiceImpl) Delete(ids int) (*respons.DeleteTugasRespon, error) {
-	getId, err := us.repo.GetById(uint(ids))
+func (us *TugasServiceImpl) Delete(ids uint) (*respons.DeleteTugasRespon, error) {
+	getId, err := us.repo.GetById(ids)
 	if err != nil {
 		return nil, err
 	}
