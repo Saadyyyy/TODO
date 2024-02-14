@@ -182,3 +182,61 @@ func Test_UpdateFailedId(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 }
+
+func Test_TugasDeleteSuccess(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	data := models.Tugas{
+		Model: gorm.Model{
+			ID: 3,
+		},
+	}
+	// var respon respons.UpdateTugasRespon
+	mockRepo.On("Delete", mock.AnythingOfType("*models.Tugas")).Return(&data, nil)
+	mockRepo.On("GetById", data.ID).Return(&data, nil)
+
+	result, err := serv.Delete(data.ID)
+
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_UpdateFailedDeletes(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	data := models.Tugas{
+		Model: gorm.Model{
+			ID: 4,
+		},
+	}
+	mockRepo.On("Delete", mock.AnythingOfType("*models.Tugas")).Return(nil, errors.New("Mock id Error"))
+	mockRepo.On("GetById", data.ID).Return(&data, nil)
+
+	result, err := serv.Delete(data.ID)
+
+	assert.Nil(t, result)
+	assert.NotNil(t, err)
+
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_UpdateFailedDeletesId(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	data := models.Tugas{
+		Model: gorm.Model{
+			ID: 7,
+		},
+	}
+	mockRepo.On("Delete", mock.AnythingOfType("*models.Tugas")).Return(&data, nil).Maybe()
+	mockRepo.On("GetById", data.ID).Return(nil, errors.New("mock erorr delete id"))
+
+	result, err := serv.Delete(data.ID)
+
+	assert.Nil(t, result)
+	assert.NotNil(t, err)
+
+	mockRepo.AssertExpectations(t)
+}
