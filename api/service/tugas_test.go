@@ -240,3 +240,104 @@ func Test_UpdateFailedDeletesId(t *testing.T) {
 
 	mockRepo.AssertExpectations(t)
 }
+
+func Test_TugasGetByStatusSuccess(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	status := true
+	mockData := []*models.Tugas{
+		{
+			Model: gorm.Model{
+				ID:        1,
+				CreatedAt: time.Now(),
+			},
+			Task:        "ayam",
+			Level:       "easy",
+			Deadline:    "besok",
+			Description: "apalah dia ni",
+			Status:      true,
+		},
+	}
+	mockRepo.On("GetByStatus", status, mock.Anything, mock.Anything).Return(mockData, nil)
+	result, err := serv.GetByStatus(status, 1, 2)
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_TugasGetByStatusFailed(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	status := true
+	mockRepo.On("GetByStatus", status, mock.Anything, mock.Anything).Return(nil, errors.New("Failed to mock data"))
+	result, _ := serv.GetByStatus(status, 1, 2)
+	assert.Nil(t, result)
+	// assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_TugasGetByLevelSuccess(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	mockData := []*models.Tugas{
+		{
+			Model: gorm.Model{
+				ID:        1,
+				CreatedAt: time.Now(),
+			},
+			Task:        "ayam",
+			Level:       "easy",
+			Deadline:    "besok",
+			Description: "apalah dia ni",
+			Status:      true,
+		},
+	}
+	mockRepo.On("GetBylevel", mock.Anything, mock.Anything, mock.Anything).Return(mockData, nil)
+	result, err := serv.GetBylevel("", 1, 2)
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_TugasGetByLevelFailed(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	mockRepo.On("GetBylevel", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("Failed to mock data"))
+	result, _ := serv.GetBylevel("", 1, 2)
+	assert.Nil(t, result)
+	// assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_TugasGetByDeadlineSuccess(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	mockData := []*models.Tugas{
+		{
+			Model: gorm.Model{
+				ID:        1,
+				CreatedAt: time.Now(),
+			},
+			Task:        "ayam",
+			Level:       "easy",
+			Deadline:    "besok",
+			Description: "apalah dia ni",
+			Status:      true,
+		},
+	}
+	mockRepo.On("GetByDeadline", mock.Anything, mock.Anything, mock.Anything).Return(mockData, nil)
+	result, err := serv.GetByDeadline("", 1, 2)
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_TugasGetByDeadlineFailed(t *testing.T) {
+	mockRepo := new(mocksRepo.MockRespository)
+	serv := NewTugasService(mockRepo)
+	mockRepo.On("GetByDeadline", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("Failed to mock data"))
+	result, _ := serv.GetByDeadline("", 1, 2)
+	assert.Nil(t, result)
+	// assert.Nil(t, err)
+	mockRepo.AssertExpectations(t)
+}
