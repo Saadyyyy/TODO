@@ -34,7 +34,13 @@ func (m *MockRespository) GetByDeadline(ded string, page int, perPage int) ([]*m
 
 // GetById implements repository.TugasRepository.
 func (m *MockRespository) GetById(id uint) (*models.Tugas, error) {
-	panic("unimplemented")
+	arg := m.Called(id)
+	if arg.Get(0) == nil {
+		return nil, arg.Error(1)
+	} else {
+		tugasbeda := arg.Get(0).(*models.Tugas)
+		return tugasbeda, nil
+	}
 }
 
 // GetByStatus implements repository.TugasRepository.
@@ -48,8 +54,14 @@ func (m *MockRespository) GetBylevel(lvl string, page int, perPage int) ([]*mode
 }
 
 // Update implements repository.TugasRepository.
-func (m *MockRespository) Update(*models.Tugas) (*models.Tugas, error) {
-	panic("unimplemented")
+func (m *MockRespository) Update(tugas *models.Tugas) (*models.Tugas, error) {
+	arg := m.Called(tugas)
+	if arg.Get(0) == nil {
+		return nil, arg.Error(1)
+	} else {
+		tugasbeda := arg.Get(0).(*models.Tugas)
+		return tugasbeda, nil
+	}
 }
 
 func (m *MockRespository) GetAll(ctx *gin.Context, page int, perPage int) []models.Tugas {
